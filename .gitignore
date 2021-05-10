@@ -10,6 +10,11 @@ data/
 .idea/**/tasks.xml
 .idea/dictionaries
 
+# Dotenv
+.env
+.env.*
+!.env.example
+
 # Netbeans
 nbproject/
 /nbproject/
