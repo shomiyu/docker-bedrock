@@ -19,7 +19,7 @@ This base repository is [docker-nginx-php-mysql](https://github.com/nanoninja/do
 起動に以下を必要とします。
 
 ```
-- Composer 2.X 以上
+- Composer
 - Docker
 - docker-compose
 ```
@@ -197,8 +197,73 @@ docker-compose down -v
 
 このリポジトリを使用して２サイト目以降の環境を作成する場合は、コンテナの重複を防ぐために `docker-compose.yml`の`myadmin` > `container_name` と `mysqldb` > `container_name`を変更する必要があります。
 
+`container_name`を変更した場合は、環境変数のデータベースのホスト名の修正も行う必要があります。
+
+## プロジェクトツリー
+
+```
+.
+├── README.md
+├── data
+│   └── db
+│       ├── dumps
+│       └── mysql
+├── docker-compose.yml
+├── etc
+│   ├── nginx
+│   │   ├── default.conf
+│   │   └── default.template.conf
+│   ├── php
+│   │   └── php.ini
+│   └── ssl
+└── site
+    ├── config
+    ├── html
+    ├── vendor
+    ├── composer.json
+    ├── wp-cli.yml
+    └── web
+        ├── index.php
+        ├── wp-config.php
+        ├── app
+        │   ├── mu-plugins
+        │   ├── plugins
+        │   ├── themes
+        │   └── uploads
+        └── wp
+            └── index.php
+```
+
+---
+
 ## WordPress での運用
 
 Bedrock に従って WordPress の運用には下記の注意点があります。
 
-- プラグインのインストールは Composer から行う
+### プラグインのインストールは Composer で行う
+
+運用と開発を分離するため、管理画面からのインストールを許可していない。そのため、プラグインのインストールを行いたい場合は、コマンドラインで composer コマンドを使用してインストールする。
+
+また、プラグインの検索は[WordPress Packagist](https://wpackagist.org/)から可能。
+
+#### 例 wordpress-popular-posts をインストールする
+
+インストールは**composer.json のある階層で実行する**必要がある。
+
+```sh
+cd site/
+composer require wpackagist-plugin/wordpress-popular-posts
+```
+
+#### 例 wordpress-popular-posts をアンインストールする
+
+間違ってインストールした場合は composer remove で削除できる。
+
+```sh
+cd site/
+composer remove wpackagist-plugin/wordpress-popular-posts
+```
+
+### 編集ファイルについて
+
+WordPress のコアファイルをいじり、間違って破壊しないように WordPress 関連で編集できるのは`/site/web/app/`配下のみとする。
